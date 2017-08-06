@@ -16,7 +16,7 @@ zabývá se převážně provozem a realizací internetových služeb, počínaj
  - [odhlášení](https://www.tele3.cz/api-logout.html)
  - [kvóta a počet přísupů do API](https://www.tele3.cz/api-get-usage.html)
  - [seznam domén](https://www.tele3.cz/api-list-domains.html)
- - [seznam kontaktů](https://www.tele3.cz/api-list-domains.html)
+ - [seznam kontaktů](https://www.tele3.cz/api-list-contacts.html)
  - [import kontaktu](https://www.tele3.cz/api-import-contact.html)
 
 
