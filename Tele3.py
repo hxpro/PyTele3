@@ -1,41 +1,7 @@
 import requests
-from typing import List
+from typing import List, Dict
+from collections import OrderedDict
 from xmltodict import parse, unparse
-
-
-class Domain:
-    def __init__(self, data: dict):
-        self.name = data['#text']
-        self.expiration = data['@expire']
-
-    def __str__(self):
-        return self.name
-
-
-class Contact:
-    def __init__(self, data: dict):
-        self.contact_id = data['contact_id']
-        self.contact_type = data['contact_type']
-        self.name = data['name']
-        self.organisation = data['organisation']
-        self.editable = bool(data['editable'] == 'yes')
-        self.deletable = bool(data['deletable'] == 'yes')
-
-    def __str__(self):
-        return self.name
-
-
-class Usage:
-    def __init__(self, data: dict):
-        self.quota = int(data['quota'])
-        self.used = int(data['used'])
-        self.remaining = int(data['remaining'])
-
-    def __str__(self):
-        return f"{self.used}/{self.quota}"
-
-    def __float__(self):
-        return self.used / self.quota
 
 
 class APIException(Exception):
@@ -44,20 +10,27 @@ class APIException(Exception):
 
 
 class API:
-
-    def __init__(self):
+    def __init__(self, debug: bool = False):
+        self.debug = debug
         self.ssid = None
+        self.contacts_list = []
+        self.contacts_info = {}
+        self.domains_list = []
+        self.domains_info = {}
 
     def _api_call(self, api_function: str, params=None):
         url = 'https://www.tele3.cz/api/'
         if api_function == 'login':
             self.ssid = None
         if not self.ssid and api_function != 'login':
-            raise APIException('Unknown ssid, use API.login() first')
+            raise APIException('Unknown SSID, use API.login() first')
         payload = unparse({'api': {'ssid': self.ssid, api_function: params}})
+        if self.debug:
+            print(payload)
         req_response = requests.post(url, payload)
         response = parse(req_response.text)['api']
-
+        if self.debug:
+            print(req_response.text)
         try:
             self.last_status_code = response['status']['@code']
             self.last_status_text = response['status']['#text']
@@ -69,7 +42,6 @@ class API:
             self.credit = response['credit']['#text']
         except:
             raise APIException(self.last_status_text)
-
         return response
 
     def _expect_status(self, expected_status: List[str]):
@@ -85,29 +57,49 @@ class API:
         self._api_call('logout')
         self._expect_status(['1000'])
         self.ssid = None
+        self.contacts_list = []
+        self.domains_list = []
 
-    def usage(self) -> Usage:
+    def usage(self) -> OrderedDict:
         response = self._api_call('get_usage')
         self._expect_status(['1000'])
-        return Usage(response)
+        response.pop('status')
+        response.pop('credit')
+        return response
 
-    def domains(self) -> List[Domain]:
-        response = self._api_call('list_domains')
-        self._expect_status(['1000'])
-        r = []
-        for d in response['list_domains']['domain']:
-            r.append(Domain(d))
-        return r
+    def domains(self, update: bool = False) -> List[OrderedDict]:
+        if (not self.domains_list) or (self.domains_list and update):
+            response = self._api_call('list_domains')
+            self._expect_status(['1000'])
+            self.domains_list = response['list_domains']['domain']
+            for d in self.domains_list:
+                d['name'] = d.pop('#text')
+                d['expire'] = d.pop('@expire')
+        return self.domains_list
 
-    def contacts(self) -> List[Contact]:
-        response = self._api_call('list_contacts')
-        self._expect_status(['1000'])
-        if self.last_status_code != '1000':
-            raise APIException(self.last_status_text)
-        r = []
-        for c in response['list_contacts']['contact']:
-            r.append(Contact(c))
-        return r
+    def contacts(self, update: bool = False) -> List[OrderedDict]:
+        if not self.contacts_list or update:
+            response = self._api_call('list_contacts')
+            self._expect_status(['1000'])
+            self.contacts_list = response['list_contacts']['contact']
+        return self.contacts_list
+
+    def contact(self, contact_id: str, update: bool = False) -> Dict:
+        if contact_id not in self.contacts_info.keys() or update:
+            response = self._api_call('info_contact', contact_id)
+            self._expect_status(['1000'])
+            contact = dict(response.get('info_contact'))
+            contact['contact_id'] = contact.pop('contact')
+            self.contacts_info[contact_id] = contact
+        return self.contacts_info[contact_id]
+
+    def domain(self, domain_name: str, update: bool = False) -> Dict:
+        if domain_name not in self.domains_info.keys() or update:
+            response = self._api_call('info_domain', domain_name)
+            self._expect_status(['1000'])
+            domain = dict(response.get('info_domain'))
+            self.domains_info[domain_name] = domain
+        return self.domains_info[domain_name]
 
     def import_contact(self, contact_id: str):
         self._api_call('import_contact', params=contact_id)

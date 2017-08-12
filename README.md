@@ -16,7 +16,9 @@ zabývá se převážně provozem a realizací internetových služeb, počínaj
  - [odhlášení](https://www.tele3.cz/api-logout.html)
  - [kvóta a počet přísupů do API](https://www.tele3.cz/api-get-usage.html)
  - [seznam domén](https://www.tele3.cz/api-list-domains.html)
+ - detail domény
  - [seznam kontaktů](https://www.tele3.cz/api-list-contacts.html)
+ - detail kontaktu
  - [import kontaktu](https://www.tele3.cz/api-import-contact.html)
 
 
@@ -37,23 +39,38 @@ from PyTele3.Tele3 import API
 
 api = API()
 api.login('UserID', 'apipassword')
+
+# Přístupy do API jsou omezeny dle počtu domén v účtu
 usage = api.usage()
 
-# Vypíše kolik přístupů z kolika již máš vyčerpáno
-print(usage)
+# Kvóta přístupů
+quota = int(usage.get('quota'))
 
+# Vyčerpáno přístupů
+used = int(usage.get('used'))
+
+# Zbývá přístupů
+remaining = int(usage.get('remaining'))
+
+
+# Seznam domén
 domains = api.domains()
-for domain in domains:
-    # Vypíše jméno domény a kdy expiruje
-    print(f"{domain.name} expire {domain.expiration}")
 
+# Vypíše jména domén a kdy expirují
+for domain in domains:
+
+    print(f"Doména {domain.get('name')} vyprší {domain.get('expire')}")
+
+
+# Seznam kontaktů
 contacts = api.contacts()
 for contact in contacts:
-    # Netušíš co objekt obsahuje, zkus si to vypsat
-    print(contact.__dict__)
+    # Netušíš co objekt obsahuje, zkus se podívat
+    print(contact.keys())
 ```
 
 ## Spolupráce
 S pythonem se teprve seznamuji, takže pokud si myslíš,
 že dělám něco špatně, nebo bys mi chtěl poradit,
-rád se naučím něco nového. Chybí ti nějaká funkcionalita, vytvoř issue, nebo rovnou PR.
+rád se naučím něco nového. Chybí ti nějaká funkcionalita,
+vytvoř issue, nebo rovnou PR.
