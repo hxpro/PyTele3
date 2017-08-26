@@ -104,3 +104,7 @@ class API:
     def import_contact(self, contact_id: str):
         self._api_call('import_contact', params=contact_id)
         self._expect_status(['1000'])
+
+    def renew(self, domain: str, period: int):
+        self._api_call('renew_domain', params={'domain': domain, 'period': period})
+        self._expect_status(['1000'])

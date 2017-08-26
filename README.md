@@ -1,14 +1,14 @@
 # PyTele3
-neoficiální klient pro přístup k [API](https://www.tele3.cz/api.html) společnosti [TELE3](https://www.tele3.cz)
-
-projekt je ve fázi návrhu, je možné,
+Neoficiální klient pro přístup k [API](https://www.tele3.cz/api.html)
+společnosti [TELE3](https://www.tele3.cz).
+Projekt je ve fázi návrhu, je možné,
 že se jeho rozhraní bude zásadně měnit
 
 
-## TELE3
+## ![Tele3 logo](https://www.tele3.cz/img/logo.jpg)
+
 zabývá se převážně provozem a realizací internetových služeb, počínaje registrací domén a souvisejícími webhostingovými službami, až po správu serverů a servisní činnost v oblasti telekomunikací.
 
-![Tele3 logo](https://www.tele3.cz/img/logo.jpg)
 
 ## Implementované funkce
 
@@ -20,6 +20,7 @@ zabývá se převážně provozem a realizací internetových služeb, počínaj
  - [seznam kontaktů](https://www.tele3.cz/api-list-contacts.html)
  - detail kontaktu
  - [import kontaktu](https://www.tele3.cz/api-import-contact.html)
+ - [prodloužení domény](https://www.tele3.cz/api-renew-domain.html)
 
 
 ## Jak na to?
@@ -70,7 +71,7 @@ for contact in contacts:
 ```
 
 ## Spolupráce
-S pythonem se teprve seznamuji, takže pokud si myslíš,
+S Pythonem se teprve seznamuji, takže pokud si myslíš,
 že dělám něco špatně, nebo bys mi chtěl poradit,
 rád se naučím něco nového. Chybí ti nějaká funkcionalita,
 vytvoř issue, nebo rovnou PR.

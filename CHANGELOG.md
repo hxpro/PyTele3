@@ -11,4 +11,4 @@
  - seznam kontaktů
  - detail kontaktu
  - import kontaktu
-  
+ - prodloužení domény 
