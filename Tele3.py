@@ -26,11 +26,11 @@ class API:
             raise APIException('Unknown SSID, use API.login() first')
         payload = unparse({'api': {'ssid': self.ssid, api_function: params}})
         if self.debug:
-            print(payload)
+            print('\033[92m' + payload + '\033[0m')
         req_response = requests.post(url, payload)
         response = parse(req_response.text)['api']
         if self.debug:
-            print(req_response.text)
+            print('\033[95m' + req_response.text + '\033[0m')
         try:
             self.last_status_code = response['status']['@code']
             self.last_status_text = response['status']['#text']
