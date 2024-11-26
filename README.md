@@ -28,7 +28,7 @@ Jeden ze způsobů jak integrovat modul do projektu,
 je použít PyTele3 jako git submodul.
 ```
 git submodule add https://github.com/hxpro/PyTele3.git
-virtualenv env -p python3.6
+virtualenv env
 source env/bin/activate
 pip install -r PyTele3/requirements.txt
 ```
